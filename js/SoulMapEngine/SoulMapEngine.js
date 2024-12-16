@@ -154,6 +154,7 @@ generateSoulPlanButton.addEventListener("click", function () {
     });
 
     const [destinoFirst, destinoSecond] = destinoDaAlma.split('-').map(Number);
+    
     if (frequencyMap[destinoFirst]) {
         frequencyMap[destinoFirst]++;
     } else {
