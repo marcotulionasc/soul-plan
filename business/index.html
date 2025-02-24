@@ -1,0 +1,274 @@
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Giovana Zancani Ferreira - Calculator Soul</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;700&display=swap');
+
+        body {
+            font-family: 'Cormorant Garamond', serif;
+        }
+    </style>
+</head>
+
+<body class="bg-[#BF926B] text-[#59162F] font-sans flex flex-col min-h-screen">
+
+    <header class="bg-[#8C3E4C] text-white border-b border-[#59162F]">
+        <div class="container mx-auto flex items-center justify-between p-4">
+            <h1 class="text-2xl font-bold">Giovana Zancani Ferreira</h1>
+        </div>
+    </header>
+
+    <main class="flex-grow flex justify-center items-center p-4">
+        <section
+            class="bg-[#D97B73] p-6 rounded-lg shadow-lg border border-[#8C451C] w-full max-w-4xl flex flex-col md:flex-row">
+            <div class="w-full md:w-1/2 flex justify-center items-center p-4">
+                <img src="../profile.jpg" alt="Imagem" class="rounded-lg shadow-md border border-[#8C451C]">
+            </div>
+
+            <div class="w-full md:w-1/2 p-6 md:p-10 mt-20">
+                <h2 class="text-2xl md:text-3xl font-bold text-center mb-8 text-[#59162F]">
+                    Digite o nome completo do seu negócio!
+                </h2>
+                <form id="soulForm" class="space-y-6">
+                    <div class="space-y-2">
+                        <label for="fullName" class="block text-sm font-medium text-[#8C3E4C]">Nome Completo do seu Negócio:</label>
+                        <div class="relative">
+                            <input type="text" id="businessName" placeholder="Digite o nome do negócio" required
+                                class="mt-1 pl-4 pr-4 py-2 w-full bg-white text-[#59162F] border border-[#8C451C] rounded-md focus:outline-none 
+                                focus:ring-2 focus:ring-[#D97B73] transition-transform transform focus:scale-[1.02]">
+                        </div>
+                    </div>
+                    <div>
+                        <button
+                            type="button"
+                            id="generateBusinessPlanButton"
+                            class="w-full bg-[#8C451C] hover:bg-[#59162F] text-white px-4 py-2 rounded-md shadow-md transform transition-transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-[#D97B73]">
+                            Geração dos cálculos
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </section>
+    </main>
+
+    <footer class="bg-[#8C3E4C] text-white border-t border-[#59162F] p-4">
+        <div class="container mx-auto text-center">
+            <p class="text-sm">© 2025 Giovana Zancani Ferreira. Todos os direitos reservados.</p>
+        </div>
+    </footer>
+
+    <script>
+        // Tabela de valores das letras
+        const letterValues = {
+            A: 1, Á: 1, B: 2, C: 11, Ç: 11, D: 4, E: 5, É: 5, F: 17, G: 3, H: 5, I: 10, Í: 10, J: 10, K: 19, L: 12,
+            M: 13, N: 14, O: 6, Ó: 6, P: 17, Q: 19, R: 20, S: 15, T: 9, U: 6, Ú: 6, V: 6, W: 6, X: 15, Y: 16, Z: 7,
+            AH: 5, CH: 8, SH: 21, TA: 22, TH: 22, TZ: 18, WH: 16
+        };
+
+        // Valores finais especiais para algumas letras
+        const finalLetterValues = {
+            M: 12,
+            P: 12
+        };
+
+        // Função para somar dígitos de um número
+        const sumDigits = (value) => {
+            return value
+                .toString()
+                .split("")
+                .reduce((sum, digit) => sum + parseInt(digit), 0);
+        };
+
+        // Reduz repetidamente até um dígito (1-9)
+        const reduceToSingleDigit = (value) => {
+            while (value > 9) {
+                value = sumDigits(value);
+            }
+            return value;
+        };
+
+        // Reduz ao padrão do Soul Plan (até 22)
+        const reduceNumerology = (value) => {
+            while (value > 22) {
+                value = sumDigits(value);
+            }
+            return value;
+        };
+
+        const generateBusinessPlanButton = document.getElementById("generateBusinessPlanButton");
+
+        generateBusinessPlanButton.addEventListener("click", function () {
+            let businessName = document.getElementById("businessName").value;
+
+            if (businessName.trim() === "") {
+                alert("Por favor, preencha o nome do negócio para gerar o plano.");
+                return;
+            }
+
+            // Remove espaços e converte para maiúsculas
+            businessName = businessName.replace(/\s+/g, "").toUpperCase();
+
+            // Monta um array de caracteres/padrões (pares especiais e letras avulsas)
+            const nameArray = [];
+            let i = 0;
+            while (i < businessName.length) {
+                const pair = businessName.slice(i, i + 2);
+                if (letterValues[pair]) {
+                    nameArray.push({ char: pair, value: letterValues[pair] });
+                    i += 2;
+                } else {
+                    const char = businessName[i];
+                    const isLastChar = i === businessName.length - 1;
+                    if (isLastChar && finalLetterValues[char]) {
+                        // Se for a última letra e estiver na tabela de finais especiais
+                        nameArray.push({ char, value: finalLetterValues[char] });
+                    } else {
+                        nameArray.push({ char, value: letterValues[char] || 0 });
+                    }
+                    i += 1;
+                }
+            }
+
+            // Ajuste novamente a última letra caso seja final especial
+            const lastChar = nameArray[nameArray.length - 1];
+            if (finalLetterValues[lastChar.char]) {
+                nameArray[nameArray.length - 1] = {
+                    char: lastChar.char,
+                    value: finalLetterValues[lastChar.char]
+                };
+            }
+
+            // Aqui NÃO vamos usar lógica de 6 grupos (mesmo se maior que 9 letras).
+            // Vamos apenas criar 3 grupos fixos para o 'nome curto'.
+            // E renomeá-los para Bases, Habilidades, Sucesso
+            const groups = [
+                { name: "Bases", letters: [], originalTotal: 0, reducedTotal: 0 },
+                { name: "Habilidades", letters: [], originalTotal: 0, reducedTotal: 0 },
+                { name: "Sucesso", letters: [], originalTotal: 0, reducedTotal: 0 },
+            ];
+
+            // Distribui as letras em round-robin para cada grupo
+            nameArray.forEach((item, index) => {
+                const groupIndex = index % groups.length;
+                groups[groupIndex].letters.push(item);
+                groups[groupIndex].originalTotal += item.value;
+            });
+
+            // Calcula a redução numerológica para cada grupo
+            groups.forEach(group => {
+                group.reducedTotal = reduceNumerology(group.originalTotal);
+            });
+
+            // Cálculo do "destino" (similar ao "destino da alma")
+            let totalFirstParts = 0;
+            let totalSecondParts = 0;
+
+            groups.forEach(group => {
+                totalFirstParts += group.reducedTotal;
+                if (group.reducedTotal <= 9) {
+                    totalSecondParts += group.reducedTotal;
+                } else {
+                    let summed = sumDigits(group.reducedTotal);
+                    summed = reduceToSingleDigit(summed);
+                    totalSecondParts += summed;
+                }
+            });
+
+            if (totalFirstParts > 22) {
+                totalFirstParts = reduceNumerology(totalFirstParts);
+            }
+
+            let destinoSecondPart = 0;
+            if (totalFirstParts <= 9) {
+                destinoSecondPart = totalFirstParts;
+            } else {
+                destinoSecondPart = sumDigits(totalFirstParts);
+                destinoSecondPart = reduceToSingleDigit(destinoSecondPart);
+            }
+
+            const destinoDaAlma = `${totalFirstParts}-${destinoSecondPart}`;
+
+            // Verifica a frequência de cada número para encontrar a(s) vibração(ões) dominante(s)
+            const frequencyMap = {};
+            groups.forEach(group => {
+                if (frequencyMap[group.reducedTotal]) {
+                    frequencyMap[group.reducedTotal]++;
+                } else {
+                    frequencyMap[group.reducedTotal] = 1;
+                }
+
+                let secondPart = 0;
+                if (group.reducedTotal <= 9) {
+                    secondPart = group.reducedTotal;
+                } else {
+                    secondPart = sumDigits(group.reducedTotal);
+                    secondPart = reduceToSingleDigit(secondPart);
+                }
+
+                if (frequencyMap[secondPart]) {
+                    frequencyMap[secondPart]++;
+                } else {
+                    frequencyMap[secondPart] = 1;
+                }
+            });
+
+            // Adiciona as partes do destino ao mapa de frequência
+            const [destinoFirst, destinoSecond] = destinoDaAlma.split('-').map(Number);
+            if (frequencyMap[destinoFirst]) {
+                frequencyMap[destinoFirst]++;
+            } else {
+                frequencyMap[destinoFirst] = 1;
+            }
+
+            if (frequencyMap[destinoSecond]) {
+                frequencyMap[destinoSecond]++;
+            } else {
+                frequencyMap[destinoSecond] = 1;
+            }
+
+            // Descobre qual(is) número(s) têm a maior frequência
+            let vibDominante = [];
+            for (const [number, freq] of Object.entries(frequencyMap)) {
+                if (freq >= 4) {
+                    vibDominante.push(number);
+                }
+            }
+
+            if (vibDominante.length === 0) {
+                let maxFrequency = 0;
+                for (const freq of Object.values(frequencyMap)) {
+                    if (freq > maxFrequency) {
+                        maxFrequency = freq;
+                    }
+                }
+                for (const [number, freq] of Object.entries(frequencyMap)) {
+                    if (freq === maxFrequency) {
+                        vibDominante.push(number);
+                    }
+                }
+            }
+
+            // Remove duplicados e ordena
+            vibDominante = [...new Set(vibDominante)].sort((a, b) => a - b);
+            const vibracaoDominante = vibDominante.join(', ');
+
+            // Prepara objeto de resultados
+            const results = {
+                nameArray,
+                groups,
+                destinoDaAlma,
+                vibracaoDominante
+            };
+
+            // Armazena em localStorage (pode ajustar conforme sua necessidade)
+            localStorage.setItem('businessResults', JSON.stringify(results));
+
+            // Redireciona para página de resultados (ajuste se desejar outra forma de exibir)
+            window.location.href = 'results.html';
+        });
+    </script>
+</body>
+</html>
